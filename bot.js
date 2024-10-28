@@ -2,7 +2,7 @@ const TelegramBot = require('node-telegram-bot-api');
 const axios = require('axios');
 
 // Last.fm API kalitini kiriting
-const lastFmApiKey = 'YOUR_LAST_FM_API_KEY'; // O'z Last.fm API kalitingizni joylashtiring
+const lastFmApiKey = 'd3b805d9dbaf59a5649698c5e6d24d5d'; // O'z Last.fm API kalitingiz
 
 // Bot tokenini kiriting
 const token = '7529923721:AAE7CoWB9aj1xCuW6cXwuotRHZRp_1YZlwM';
