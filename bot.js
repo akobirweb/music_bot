@@ -27,14 +27,15 @@ bot.on('message', (msg) => {
                 // Musiqa topilganda
                 const trackButtons = tracks.map((track, index) => ({
                     text: `${index + 1}. ${track.name} by ${track.artist}`,
-                    callback_data: track.url // Musiqa manzilini callback_data sifatida saqlaymiz
+                    callback_data: `${index + 1}` // Musiqaning tartib raqamini callback_data sifatida saqlaymiz
                 }));
 
                 const inlineKeyboard = {
-                    inline_keyboard: [trackButtons.slice(0, 5), trackButtons.slice(5, 10)],
+                    inline_keyboard: [trackButtons],
                 };
 
-                bot.sendMessage(chatId, 'Musiqa topildi:', {
+                // Musiqani tartib raqami bilan ko'rsatamiz
+                bot.sendMessage(chatId, `Musiqa topildi! Sizning yoqtirgan musiqangiz:`, {
                     reply_markup: inlineKeyboard
                 });
             } else {
@@ -51,8 +52,12 @@ bot.on('message', (msg) => {
 // Tugmalarga bosilganda
 bot.on('callback_query', (callbackQuery) => {
     const chatId = callbackQuery.message.chat.id;
-    const trackUrl = callbackQuery.data; // Foydalanuvchi bosgan tugma URL manzilini olamiz
+    const trackIndex = parseInt(callbackQuery.data) - 1; // Tugmadagi tartib raqamini olamiz
+    const musicName = callbackQuery.message.reply_markup.inline_keyboard[0][trackIndex].text; // Musiqa nomini olamiz
 
     // Musiqa ijro etish
-    bot.sendMessage(chatId, `Ijtimoiy media: ${trackUrl}`); // URLni foydalanuvchiga jo'natamiz (buni o'zgartirishingiz mumkin)
+    bot.sendMessage(chatId, `Siz tanlagan musiqa: ${musicName}`); // Tanlangan musiqani foydalanuvchiga jo'natamiz
+
+    // Ijtimoiy media (musiqani ijro etish uchun URL yo'q, buni o'zgartirish mumkin)
+    bot.sendMessage(chatId, `Musiqa ijro etilmoqda: ${musicName}...`); // Ijtimoiy media orqali ijro etish
 });
