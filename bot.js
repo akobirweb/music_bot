@@ -2,7 +2,7 @@ const TelegramBot = require('node-telegram-bot-api');
 const axios = require('axios');
 
 // Last.fm API kalitini kiriting
-const lastFmApiKey = 'd3b805d9dbaf59a5649698c5e6d24d5d'; // O'z Last.fm API kalitingizni joylashtiring
+const lastFmApiKey = 'YOUR_LAST_FM_API_KEY'; // O'z Last.fm API kalitingizni joylashtiring
 
 // Bot tokenini kiriting
 const token = '7529923721:AAE7CoWB9aj1xCuW6cXwuotRHZRp_1YZlwM';
@@ -12,24 +12,6 @@ const bot = new TelegramBot(token, { polling: true });
 bot.onText(/\/start/, (msg) => {
     bot.sendMessage(msg.chat.id, 'Salom! Musiqa nomini kiriting, men sizga musiqa haqida ma\'lumot beraman.');
 });
-
-// Musiqa ro'yxatini yaratish
-function createMusicButtons(tracks, chatId) {
-    const buttons = tracks.map((track, index) => ({
-        text: `${index + 1}: ${track.name} by ${track.artist}`,
-        callback_data: track.url // Musiqa URL'sini callback data sifatida olamiz
-    }));
-
-    const replyMarkup = {
-        inline_keyboard: [
-            buttons.map(button => [{ text: button.text, callback_data: button.callback_data }])
-        ]
-    };
-
-    bot.sendMessage(chatId, 'Musiqa ro\'yxati tayyor! Iltimos, ijro etish uchun raqamni bosing.', {
-        reply_markup: replyMarkup
-    });
-}
 
 // Foydalanuvchi musiqa nomini yozganda
 bot.on('message', (msg) => {
@@ -43,7 +25,18 @@ bot.on('message', (msg) => {
 
             if (tracks.length > 0) {
                 // Musiqa topilganda
-                createMusicButtons(tracks, chatId); // Musiqa tugmalarini yaratamiz
+                const trackButtons = tracks.map((track, index) => ({
+                    text: `${index + 1}. ${track.name} by ${track.artist}`,
+                    callback_data: track.url // Musiqa manzilini callback_data sifatida saqlaymiz
+                }));
+
+                const inlineKeyboard = {
+                    inline_keyboard: [trackButtons.slice(0, 5), trackButtons.slice(5, 10)],
+                };
+
+                bot.sendMessage(chatId, 'Musiqa topildi:', {
+                    reply_markup: inlineKeyboard
+                });
             } else {
                 // Musiqa topilmasa
                 bot.sendMessage(chatId, 'Kechirasiz, bunday musiqa topilmadi.');
@@ -55,13 +48,11 @@ bot.on('message', (msg) => {
         });
 });
 
-// Inline tugmalar bosilganda musiqa ijro etish
-bot.on('callback_query', (query) => {
-    const chatId = query.message.chat.id;
-    const musicUrl = query.data; // Callback data sifatida olingan URL
+// Tugmalarga bosilganda
+bot.on('callback_query', (callbackQuery) => {
+    const chatId = callbackQuery.message.chat.id;
+    const trackUrl = callbackQuery.data; // Foydalanuvchi bosgan tugma URL manzilini olamiz
 
-    const audio = new Audio(musicUrl); // Musiqani ijro etish
-    audio.play();
-
-    bot.sendMessage(chatId, 'Musiqa ijro etilmoqda!');
+    // Musiqa ijro etish
+    bot.sendMessage(chatId, `Ijtimoiy media: ${trackUrl}`); // URLni foydalanuvchiga jo'natamiz (buni o'zgartirishingiz mumkin)
 });
